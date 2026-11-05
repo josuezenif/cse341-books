@@ -1,5 +1,7 @@
 import express from "express";
 import { getBooksHandler, getBookByIdHandler } from "./controllers/books.js";
+import { getAllAuthorsHandler, getAuthorByIdHandler as getOneAuthor, createAuthorHandler, updateAuthorHandler, deleteAuthorHandler } from "./controllers/authors.js";
+import { create } from "node:domain";
 
 const router = express.Router();
 
@@ -74,5 +76,241 @@ router.get('/books', getBooksHandler);
  *                   type: string
  */
 router.get('/books/:_id', getBookByIdHandler);
+
+/**
+ * @swagger
+ * /authors:
+ *   get:
+ *     summary: Get all authors
+ *     tags:
+ *       - Authors
+ *     responses:
+ *       200:
+ *         description: A list of authors
+ *       500:
+ *         description: Unable to retrieve authors
+ */
+router.get('/authors', getAllAuthorsHandler);
+
+/**
+ * @swagger
+ * /authors/{_id}:
+ *   get:
+ *     tags:
+ *       - Authors
+ *     summary: Get an Author by ID
+ *     parameters:
+ *       - in: path
+ *         name: _id
+ *         required: true
+ *         description: ID of the author to retrieve.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: The requested author.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               additionalProperties: true
+ *       404:
+ *         description: No author was found with the specified ID.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: The author could not be retrieved.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
+router.get('/authors/:_id', getOneAuthor);
+
+/**
+ * @swagger
+ * /authors:
+ *   post:
+ *     tags:
+ *       - Authors
+ *     summary: Create a new author
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - _id
+ *               - name
+ *               - birthYear
+ *             properties:
+ *               _id:
+ *                 type: string
+ *                 description: Unique author ID.
+ *               name:
+ *                 type: string
+ *                 description: Author name.
+ *               birthYear:
+ *                 type: integer
+ *                 description: Author birth year.
+ *     responses:
+ *       201:
+ *         description: The author was created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               additionalProperties: true
+ *       400:
+ *         description: Missing required author fields or duplicate ID.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: The author could not be created.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
+router.post('/authors', createAuthorHandler);
+
+/**
+ * @swagger
+ * /authors/{_id}:
+ *   put:
+ *     tags:
+ *       - Authors
+ *     summary: Update an author by ID
+ *     parameters:
+ *       - in: path
+ *         name: _id
+ *         required: true
+ *         description: ID of the author to update.
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - birthYear
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Updated author name.
+ *               birthYear:
+ *                 type: integer
+ *                 description: Updated author birth year.
+ *     responses:
+ *       200:
+ *         description: The author was updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               additionalProperties: true
+ *       400:
+ *         description: Missing required fields or the author does not exist.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: No author was found to update.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: The author could not be updated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
+router.put('/authors/:_id', updateAuthorHandler);
+
+/**
+ * @swagger
+ * /authors/{_id}:
+ *   delete:
+ *     tags:
+ *       - Authors
+ *     summary: Delete an author by ID
+ *     parameters:
+ *       - in: path
+ *         name: _id
+ *         required: true
+ *         description: ID of the author to delete.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: The author was deleted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: No author was found to delete.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       409:
+ *         description: The author is associated with books and cannot be deleted.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: The author could not be deleted.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
+router.delete('/authors/:_id', deleteAuthorHandler);
 
 export default router;
