@@ -1,5 +1,5 @@
 import express from "express";
-import { getBooksHandler, getBookByIdHandler } from "./controllers/books.js";
+import { getBooksHandler, getBookByIdHandler, createBookHandler, updateBookHandler, deleteBookHandler } from "./controllers/books.js";
 import { getAllAuthorsHandler, getAuthorByIdHandler as getOneAuthor, createAuthorHandler, updateAuthorHandler, deleteAuthorHandler } from "./controllers/authors.js";
 import { create } from "node:domain";
 
@@ -76,6 +76,178 @@ router.get('/books', getBooksHandler);
  *                   type: string
  */
 router.get('/books/:_id', getBookByIdHandler);
+
+/**
+ * @swagger
+ * /books:
+ *   post:
+ *     tags:
+ *       - Books
+ *     summary: Create a new book
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - _id
+ *               - authorId
+ *               - title
+ *               - publicationYear
+ *             properties:
+ *               _id: 
+ *                type: string
+ *                description: Id of new book
+ *               authorId:
+ *                 type: string
+ *                 description: Author ID of the book.
+ *               title:
+ *                 type: string
+ *                 description: Title of the book.
+ *               publicationDate:
+ *                 type: string
+ *                 description: Publication date of the book. Format "2015-12-31"
+ *     responses:
+ *       201:
+ *         description: The book was created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               additionalProperties: true
+ *       400:
+ *         description: Missing required book fields or duplicate book ID.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: The book could not be created.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
+router.post('/books', createBookHandler);
+
+/**
+ * @swagger
+ * /books/{_id}:
+ *   put:
+ *     tags:
+ *       - Books
+ *     summary: Update a book by ID
+ *     parameters:
+ *       - in: path
+ *         name: _id
+ *         required: true
+ *         description: ID of the book to update.
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - authorId
+ *               - publicationDate
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: Updated title of the book.
+ *               authorId:
+ *                 type: string
+ *                 description: Updated authorId of the book.
+ *               publicationDate:
+ *                 type: string
+ *                 description: Updated publication date of the book. Format "2015-12-31"
+ *     responses:
+ *       200:
+ *         description: The book was updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               additionalProperties: true
+ *       400:
+ *         description: Missing required fields or invalid update request.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: No book was found to update.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: The book could not be updated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
+router.put('/books/:_id', updateBookHandler);
+
+/**
+ * @swagger
+ * /books/{_id}:
+ *   delete:
+ *     tags:
+ *       - Books
+ *     summary: Delete a book by ID
+ *     parameters:
+ *       - in: path
+ *         name: _id
+ *         required: true
+ *         description: ID of the book to delete.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: The book was deleted successfully.
+ *       404:
+ *         description: No book was found to delete.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: The book could not be deleted.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
+router.delete('/books/:_id', deleteBookHandler);
+
+// -------------------------------------------------------------------------------------------------------------------------
 
 /**
  * @swagger
